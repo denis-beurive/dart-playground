@@ -1,0 +1,1 @@
+This project contains test scripts written during my study of the Dart programming language.
