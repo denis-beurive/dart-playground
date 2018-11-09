@@ -1,5 +1,7 @@
-
-
+// This script illustrates the use of streams. Streams are like event FIFOs.
+// It is possible to subscribe to a stream by listening to it. The listener is
+// informed of the arrival of events.
+//
 // https://www.dartlang.org/tutorials/language/streams
 // https://www.dartlang.org/articles/libraries/creating-streams
 
@@ -7,17 +9,57 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-class Container {
+/// This class encapsulates all the necessary data used by the "onValue" event
+/// handler (the construct avoids using global variables).
+class OnValueHandlerContainer {
+  static StreamSubscription<int> _streamSubscriber;
+  static int _count = 0;
+
+  static setStreamSubscriber(StreamSubscription<int> stream) {
+    _streamSubscriber = stream;
+  }
+
+  // Handler executed when a event is received within the stream.
+  //
+  // WARNING: you have absolutely no idea when this handler will be executed.
+  // Do not assume that it will be executed right after the execution of the code
+  // that emits an event. It may be executed several lines (of codes) below the
+  // line that emits the event. It may well be executed at the end of the script...
+
+  static void onValue(int value) {
+    _count++;
+    print("[X] An event has been raised. The associated value is ${value}! Count > ${_count}");
+    // Pause the subscription.
+    //
+    // While paused, the subscription will not fire any events. If it receives
+    // events from its source, they will be buffered until the subscription is
+    // resumed.
+    print("Pause the subscription.");
+    _streamSubscriber.pause();
+    print("Wait for 1 second and resume the subscription.");
+    sleep(Duration(seconds: 1));
+    _streamSubscriber.resume();
+  }
+}
+
+/// This class encapsulates all the necessary data used by stream (the construct
+/// avoids using global variables).
+class StreamContainer {
   static Random _random_generator = Random(123);
   static int count_ten_and_above = 0;
 
   // This function creates a stream of integers.
-  static Stream<int> streamer([int count=2, String prefix='']) async* {
+  /// This method creates a stream of integers.
+  /// The parameter [count] represents the number of events to emit.
+  /// The parameter [prefix] is a string that will be printed at the beginning of each message.
+  /// The parameter [duration] represents the number of seconds to wait until the next event.
+  static Stream<int> streamer({int count=2, String prefix='', int duration=1}) async* {
     count_ten_and_above = 0;
-    for (int i=0; i<3; i++) {
+    prefix = prefix != '' ? "[${prefix}] " : '';
+    for (int i=0; i<count; i++) {
       int v = _random_generator.nextInt(10) + _random_generator.nextInt(10);
-      print("[${prefix}] Wait 2 seconds and then generate a value ${v}");
-      sleep(Duration(seconds: count));
+      print("${prefix}Wait ${duration} seconds and then generate the value ${v}");
+      sleep(Duration(seconds: duration));
       if (v > 10) { count_ten_and_above++; }
       yield v;
     }
@@ -39,7 +81,7 @@ main() async {
 
   // Create a stream.
   print("Start the stream creator now");
-  Stream<int> s = Container.streamer();
+  Stream<int> s = StreamContainer.streamer();
   print("The stream is created, however it did not emit any value yet (since no listener is litening to it)");
 
   print("Wait 5 seconds, just to show that the stream will start to emit only when a listener will listen to it.");
@@ -56,7 +98,7 @@ main() async {
   // Or, we could have written...
 
   print('Start waiting for values from the stream...');
-  await for (int value in Container.streamer()) {
+  await for (int value in StreamContainer.streamer()) {
     print("Received one value from the stream: ${value}");
   }
   print("Done");
@@ -69,7 +111,7 @@ main() async {
   // asBroadcastStream to create a broadcast stream on top of the non-broadcast
   // stream.
   print("Create a broadcast stream. Note that it does not start to emit values until it gets assigned a listener.");
-  s = Container.streamer(5).asBroadcastStream();
+  s = StreamContainer.streamer(count: 5).asBroadcastStream();
   print("Wait 5 seconds to show that the emission has not started yet.");
 
   // Note: now the stream is assigned a listener! So it starts emitting values.
@@ -99,20 +141,29 @@ main() async {
     print("The new stream has $value element(s).");
   });
 
-  s = Container.streamer(5, 'A');
-  print("Create a new stream of integers which values are greater that 10. These stream should contain ${Container.count_ten_and_above} integers.");
+  s = StreamContainer.streamer(count: 5, prefix: 'A');
+  print("Create a new stream of integers which values are greater that 10. These stream should contain ${StreamContainer.count_ten_and_above} integers.");
   duplicated = s.where((value) => value > 10);
   duplicated.length.then((value) {
-    assert(value == Container.count_ten_and_above);
-    print("The new stream contains $value integers (expected ${Container.count_ten_and_above}).");
+    assert(value == StreamContainer.count_ten_and_above);
+    print("The new stream contains $value integers (expected ${StreamContainer.count_ten_and_above}).");
   });
 
-  s = Container.streamer(5, 'A');
+  s = StreamContainer.streamer(count: 5, prefix: 'A');
   Stream<int> mapped = s.map((value) => 2*value);
   await mapped.forEach((value) {
     print("- mapped ${value}");
   });
 
+  // ---------------------------------------------------------------------------
+  // TEST 4: subscribing to a stream.
+  // ---------------------------------------------------------------------------
+
+  s = StreamContainer.streamer(count: 5, prefix: 'A');
+  // Please note the while an event handler is applied to the stream, a subscription
+  // handler is returned. The subscription may be paused, resumed or cancelled.
+  StreamSubscription<int> subscription = s.listen(OnValueHandlerContainer.onValue);
+  OnValueHandlerContainer.setStreamSubscriber(subscription);
 }
 
 

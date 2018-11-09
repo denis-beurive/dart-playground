@@ -74,7 +74,7 @@ main() async {
       .transform(new LineSplitter()) // Convert stream to individual lines.
       .listen((String line) {        // Process results.
         print('$line: ${line.length} bytes');
-      },
+      }, // Please note that "listen" returns an instance of StreamSubscription.
       onDone: () { print('File is now closed.'); },
       onError: (e) { print(e.toString()); });
 }
