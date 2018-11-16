@@ -14,10 +14,10 @@ import 'dart:io';
 /// This class encapsulates all the necessary data used by the "onValue" event
 /// handler (the construct avoids using global variables).
 class OnValueHandlerContainer {
-  static StreamSubscription<int> _streamSubscriber;
+  static StreamSubscription<int> _streamSubscription;
 
-  static setStreamSubscriber(StreamSubscription<int> stream) {
-    _streamSubscriber = stream;
+  static setStreamSubscription(StreamSubscription<int> stream) {
+    _streamSubscription = stream;
   }
 
   // This static method is the handler executed when a event is received through
@@ -42,9 +42,9 @@ class OnValueHandlerContainer {
     // Note 2: while paused, the subscription will not fire any events. If it receives
     //         events from its source, they will be buffered until the subscription
     //         is resumed.
-    _streamSubscriber.pause();
+    _streamSubscription.pause();
     sleep(Duration(seconds: 1));
-    _streamSubscriber.resume();
+    _streamSubscription.resume();
 
     // At this point: the state of the subscription is "active".
   }
@@ -88,9 +88,9 @@ main() async {
 
   // Add a listener to the stream.
   // Now the stream has an assigned listener.
-  StreamSubscription<int> subscriber = stream.listen(OnValueHandlerContainer.onValue);
-  OnValueHandlerContainer.setStreamSubscriber(subscriber);
-  subscriber.onDone(() => print("The subscription is done!"));
+  StreamSubscription<int> subscription = stream.listen(OnValueHandlerContainer.onValue);
+  OnValueHandlerContainer.setStreamSubscription(subscription);
+  subscription.onDone(() => print("The subscription is done!"));
   print("Does the stream provided by the controller have a listener ? ${sc.hasListener ? 'yes' : 'no'} - the answer should be yes.");
 
   // Wait for 10 seconds.
