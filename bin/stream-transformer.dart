@@ -34,6 +34,8 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
   // the original (input) stream (_stream.listen(...)).
   StreamSubscription<S> _subscription;
 
+  /// Constructor that creates a unicast stream.
+  /// [caster] An instance of "type caster".
   CasterTransformer(TypeCaster<S, T> caster, {
     bool sync: false,
     bool cancelOnError: true
@@ -49,7 +51,8 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
     _caster = caster;
   }
 
-
+  /// Constructor that creates a broadcast stream.
+  /// /// [caster] An instance of "type caster".
   CasterTransformer.broadcast(TypeCaster<S, T> caster, {
     bool sync: false,
     bool cancelOnError: true
