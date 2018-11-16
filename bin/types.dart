@@ -1,4 +1,7 @@
 
+// -----------------------------------------------------------------------------
+// TEST: class that emulate functions.
+// -----------------------------------------------------------------------------
 
 /// This class emulates a function that takes two integers and returns an integer.
 class MyClassFunction {
@@ -20,15 +23,9 @@ class MyCasterFunction extends CasterFunction<int, String> {
   }
 }
 
-
-
 main() {
-
   MyClassFunction f1 = MyClassFunction();
   print(f1(10,20));
   CasterFunction f2 = MyCasterFunction();
   print(f2(10));
-
-
-
 }
