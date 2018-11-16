@@ -81,6 +81,9 @@ main() async {
   // Push values into the stream controlled by the stream controller.
   // Because no listener subscribed to the stream, these values are just stored
   // into the stream.
+  // WARNING: according to the great answer provided on the link below, you should
+  //          not inject data into the stream before a listener subscribes to it.
+  // See: https://stackoverflow.com/questions/53336297/cli-dart-onpause-onresume-ondone-not-firing-up-as-expected
   for(int i=0; i<3; i++) {
     print("Send the value ${i} into the stream.");
     sc.add(i);
@@ -91,6 +94,12 @@ main() async {
   StreamSubscription<int> subscription = stream.listen(OnValueHandlerContainer.onValue);
   OnValueHandlerContainer.setStreamSubscription(subscription);
   subscription.onDone(() => print("The subscription is done!"));
+  // Please note that it is necessary to close the stream controller in order to
+  // close "its" stream. The closing does not take effect immediately... The
+  // controller closes when it can do it. If you don't close the controller, the
+  // "onDone" handler will not be executed.
+  // See: https://stackoverflow.com/questions/53336297/cli-dart-onpause-onresume-ondone-not-firing-up-as-expected
+  sc.close().then((var v) => print("The stream controlled is now closed"));
   print("Does the stream provided by the controller have a listener ? ${sc.hasListener ? 'yes' : 'no'} - the answer should be yes.");
 
   // Wait for 10 seconds.
