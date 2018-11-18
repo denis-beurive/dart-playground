@@ -1,5 +1,11 @@
 // Conceptually, a transformer is simply a function from Stream to Stream that
 // is encapsulated into a class.
+//
+// A transformer is made of:
+// - A stream controller. The controller provides the "output" stream that will
+//   receive the transformed values.
+// - A "bind()" method. This method is called by the "input" stream "transform"
+//   method (inputStream.transform(<the stream transformer>).
 
 import 'dart:async';
 
@@ -52,7 +58,7 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
   }
 
   /// Constructor that creates a broadcast stream.
-  /// /// [caster] An instance of "type caster".
+  /// [caster] An instance of "type caster".
   CasterTransformer.broadcast(TypeCaster<S, T> caster, {
     bool sync: false,
     bool cancelOnError: true
@@ -67,9 +73,19 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
   }
 
   /// Handler executed whenever a listener subscribes to the controller's stream.
+  /// Note: when the transformer is applied to the original stream, through call
+  ///       to the method "transform", the method "bind()" is called behind the
+  ///       scenes. The method "bind()" returns the controller stream.
+  ///       When a listener is applied to the controller stream, then this function
+  ///       (that is "_onListen()") will be executed. This function will set the
+  ///       handler ("_onData") that will be executed each time a value appears
+  ///       in the original stream. This handler takes the incoming value, casts
+  ///       it, and inject it to the (controller) output stream.
+  /// Note: this method is called only once. On the other hand, the method "_onData"
+  ///       is called as many times as there are values to transform.
   void _onListen() {
     _subscription = _stream.listen(
-        onData,
+        _onData,
         onError: _controller.addError,
         onDone: _controller.close,
         cancelOnError: _cancelOnError
@@ -84,7 +100,8 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
 
   /// Handler executed whenever data comes from the original (input) stream.
   /// Please note that the transformation takes place here.
-  void onData(S data) {
+  /// Note: this method is called as many times as there are values to transform.
+  void _onData(S data) {
     _controller.add(_caster(data));
   }
 
