@@ -130,7 +130,7 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
 
   /// Set a new caster function.
   /// [caster] represents the new caster function.
-  /// Please note that this method is used in jointly with the method call.
+  /// Please note that this method is used in conjunction with the method call.
   void setNewCaster(TypeCaster caster) {
     _newCaster = caster;
   }
