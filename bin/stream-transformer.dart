@@ -40,6 +40,9 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
   StreamController<T> _controller;
   bool _cancelOnError;
   TypeCaster _caster;
+  /// This caster is used in conjunction with the method call.
+  /// it is used to instantiate a new transformer that accepts different (and
+  /// incompatible) input/output data types.
   TypeCaster _newCaster;
 
   // Original (or input) stream.
