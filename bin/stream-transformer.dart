@@ -16,9 +16,17 @@ abstract class TypeCaster<S, T> {
 }
 
 /// This class emulates a converter from integers to strings.
-class Caster extends TypeCaster<int, String> {
+class CasterInt2String extends TypeCaster<int, String> {
   String call(int value) {
     return "<${value.toString()}>";
+  }
+}
+
+/// This class emulates a converter from any numerical values to strings.
+class CasterNum2String extends TypeCaster<num, String> {
+  String call(num value) {
+    // We could perform some sanity checks here...
+    return value.toString();
   }
 }
 
@@ -31,7 +39,8 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
 
   StreamController<T> _controller;
   bool _cancelOnError;
-  TypeCaster<S, T> _caster;
+  TypeCaster _caster;
+  TypeCaster _newCaster;
 
   // Original (or input) stream.
   Stream<S> _stream;
@@ -42,7 +51,7 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
 
   /// Constructor that creates a unicast stream.
   /// [caster] An instance of "type caster".
-  CasterTransformer(TypeCaster<S, T> caster, {
+  CasterTransformer(TypeCaster caster, {
     bool sync: false,
     bool cancelOnError: true
   }) {
@@ -119,11 +128,19 @@ class CasterTransformer<S, T> implements StreamTransformer<S, T> {
     return _controller.stream;
   }
 
-  // TODO: what should this method do ? Find the answer.
-  StreamTransformer<RS, RT> cast<RS, RT>() {
-    return StreamTransformer<RS, RT>((Stream<RS> stream, bool b) {
-      // What should we do here ?
-    });
+  /// Set a new caster function.
+  /// [caster] represents the new caster function.
+  /// Please note that this method is used in jointly with the method call.
+  void setNewCaster(TypeCaster caster) {
+    _newCaster = caster;
+  }
+
+  // This method is used when you need to use an already instantiated transformer
+  // to perform a transformation on data incompatible with its input/output data
+  // types. This method just instantiate a new transformer that accepts the new
+  // input/output data types.
+  CasterTransformer<RS, RT> cast<RS, RT>() {
+    return CasterTransformer<RS, RT>(_newCaster);
   }
 }
 
@@ -136,41 +153,71 @@ main() {
 
   // Create a controller that will be used to inject integers into the "input"
   // stream.
-  StreamController<int> controller_unicast = new StreamController<int>();
+  StreamController<int> intControllerUnicast = new StreamController<int>();
   // Get the stream "to control".
-  Stream<int> integer_stream_unicast = controller_unicast.stream;
+  Stream<int> intStreamUnicast = intControllerUnicast.stream;
   // Apply a transformer on the "input" stream.
   // The method "transform" calls the method "bind", which returns the stream that
   // receives the transformed values.
-  Stream<String> string_stream_unicast = integer_stream_unicast.transform(CasterTransformer<int, String>(new Caster()));
+  Stream<String> stringStreamUnicast = intStreamUnicast.transform(CasterTransformer<int, String>(new CasterInt2String()));
 
-  string_stream_unicast.listen((data) {
+  stringStreamUnicast.listen((data) {
     print('String => $data');
   });
 
   // Inject integers into the "input" stream.
-  controller_unicast.add(1);
-  controller_unicast.add(2);
-  controller_unicast.add(3);
+  intControllerUnicast.add(1);
+  intControllerUnicast.add(2);
+  intControllerUnicast.add(3);
 
   // ---------------------------------------------------------------------------
   // TEST: broadcast controller.
   // ---------------------------------------------------------------------------
 
-  StreamController<int> controller_broadcast = new StreamController<int>.broadcast();
-  Stream<int> integer_stream_broadcast = controller_broadcast.stream;
-  Stream<String> string_stream_broadcast = integer_stream_broadcast.transform(CasterTransformer<int, String>.broadcast(new Caster()));
+  StreamController<int> intControllerBroadcast = new StreamController<int>.broadcast();
+  Stream<int> intStreamBroadcast = intControllerBroadcast.stream;
+  Stream<String> stringStreamBroadcast = intStreamBroadcast.transform(CasterTransformer<int, String>.broadcast(new CasterInt2String()));
 
-  string_stream_broadcast.listen((data) {
+  stringStreamBroadcast.listen((data) {
     print('Listener 1: String => $data');
   });
 
-  string_stream_broadcast.listen((data) {
+  stringStreamBroadcast.listen((data) {
     print('Listener 2: String => $data');
   });
 
-  controller_broadcast.add(1);
-  controller_broadcast.add(2);
-  controller_broadcast.add(3);
+  intControllerBroadcast.add(1);
+  intControllerBroadcast.add(2);
+  intControllerBroadcast.add(3);
+
+  // ---------------------------------------------------------------------------
+  // TEST: cast()
+  // ---------------------------------------------------------------------------
+
+  // Get a stream that accepts numerical values.
+  // Please note that an integer is a numerical value.
+  StreamController<num> numControllerUnicast = new StreamController<num>();
+  Stream<num> numStreamUnicast = numControllerUnicast.stream;
+
+  // We could have instantiated a transformer that transforms numerical values
+  // into strings (this should have implied the creation of a new "type caster").
+  // However, for the sake of this example, we voluntarily create a transformer
+  // that transforms integers to strings.
+  CasterTransformer<int, String> int2stringTransformer = CasterTransformer<int, String>(new CasterInt2String());
+
+  // Since a numerical value may not be an integer, the created transformer cannot
+  // be used to transform the values extracted from the stream "num_stream_unicast".
+  // => We "cast" the transformer "int2stringTransformer" into a transformer suitable
+  // for our needs (that is, a transformer that accepts numerical values as input).
+  int2stringTransformer.setNewCaster(CasterNum2String());
+  CasterTransformer<num, String> num2stringTransformer = int2stringTransformer.cast<num, String>();
+
+  Stream<String> newStringStreamUnicast = numStreamUnicast.transform(num2stringTransformer);
+  newStringStreamUnicast.listen((String value) => print("Got the value ${value}!"));
+
+  numControllerUnicast.add(10);
+  numControllerUnicast.add(20);
+  numControllerUnicast.add(30);
+
 }
 
