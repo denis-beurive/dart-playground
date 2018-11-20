@@ -9,6 +9,10 @@
 //
 // See https://www.dartlang.org/tutorials/language/futures
 //     https://api.dartlang.org/stable/2.0.0/dart-async/Future-class.html
+//
+// Please note that:
+// - "async" creates a Future.
+// - "async*" creates a Stream.
 
 import 'dart:async';
 import 'dart:io';

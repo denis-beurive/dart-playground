@@ -10,6 +10,10 @@
 //
 // Please note that the techniques described in this document can also be used
 // for broadcast streams.
+//
+// Please note that:
+// - "async" creates a Future.
+// - "async*" creates a Stream.
 
 import 'dart:io';
 import 'dart:async';
