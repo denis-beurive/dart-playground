@@ -1,5 +1,6 @@
 // Resources:
 // https://stackoverflow.com/questions/26826521/executing-bundle-of-functions-by-their-metadata-tag-in-dart-lang
+// https://stackoverflow.com/questions/53415552/dart-how-to-get-metadata-for-anything-other-than-classes-and-class-members
 
 import 'dart:mirrors';
 
@@ -76,6 +77,9 @@ main() {
     print(declarationMirror.metadata);
   });
 
+  TypeMirror typeMirror = reflectType(TypeProcessor);
+  print(typeMirror.originalDeclaration.metadata);
+
   // Get the metadata for a variable.
   // ???
   @Doc('/var/doc/data')
@@ -88,7 +92,5 @@ main() {
   instanceMirror.type.declarations.forEach((Symbol symbol, DeclarationMirror declarationMirror) {
     print(declarationMirror.metadata);
   });
-
-
 }
 
