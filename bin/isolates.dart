@@ -57,11 +57,16 @@ void executeRemoteCommandInteractWith(SendPort writtenToByIsolate) async {
   print(Colorize("Interacter: inform Main about the port it should use to send messages to me.")..lightGreen());
   writtenToByIsolate.send(writtenToByMain);
 
-  Stream<dynamic> inputStream = listenedToByIsolate.asBroadcastStream();
   int counter = 0;
   print(Colorize("Interacter: wait for commands to execute.")..lightGreen());
   // Note: the "await for" is a loop !
-  await for (Message receivedMessage in inputStream) {
+  // See: https://stackoverflow.com/questions/42611880/difference-between-await-for-and-listen-in-dart
+
+  // To enable asserts: dart --enable-asserts isolates.dart
+  // See: https://www.dartlang.org/guides/language/language-tour#assert
+  assert(listenedToByIsolate is Stream); // ReceivePort implements Stream.
+
+  await for (Message receivedMessage in listenedToByIsolate) {
     print(Colorize("Interacter: got a message from Main: ${receivedMessage}.")..lightGreen());
     bool last = counter++ > 2;
     writtenToByIsolate.send(receivedMessage.setStatus(rg.nextBool()).setLast(last));
@@ -102,7 +107,10 @@ main() async {
   // * "Main" sends to the channel.
   // * 'The isolate" listens to the channel.
 
+  // We will assign two listeners to the stream. Thus, we need this stream to be
+  // able to broadcast.
   Stream<dynamic> incomingMessagesStream = listenedToByMain.asBroadcastStream();
+
   SendPort writtenToByMain = await incomingMessagesStream.first;
   print("Main: got the port that I should use to send messages to the interacter.");
 
@@ -118,6 +126,7 @@ main() async {
   // Wait for the command to be executed.
   print("Main: wait for responses from the interacter.");
   // Note: the "await for" is a loop !
+  // See: https://stackoverflow.com/questions/42611880/difference-between-await-for-and-listen-in-dart
   await for (Message message in incomingMessagesStream) {
     print("Main: ${message}");
     if (message.isLast()) {
