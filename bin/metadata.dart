@@ -4,6 +4,7 @@
 // https://www.dartlang.org/articles/dart-vm/reflection-with-mirrors
 
 import 'dart:mirrors';
+import 'package:colorize/colorize.dart';
 
 /// This class represents the metadata "OnFailure".
 class OnFailure {
@@ -39,13 +40,17 @@ class ClassProcessor {
 }
 
 @OnFailure(0, 'onFatalHandler')
-typedef bool TypeProcessor(int value);
+typedef bool TypeProcessorBool(int value);
+
+@Doc('/var/doc/data')
+int data = 10;
 
 main() {
 
   ClassProcessor processorClass = ClassProcessor();
 
   // Get the metadata for a class.
+  print(Colorize("Classes")..bgGreen());
   InstanceMirror instanceMirror = reflect(processorClass);
   ClassMirror classMirror = instanceMirror.type;
   print(instanceMirror.type.metadata); // => [InstanceMirror on Instance of 'OnFailure']
@@ -54,44 +59,44 @@ main() {
   print("Handler name: ${metadata.handlerName}"); // => Handler name: onFatalHandler
 
   // Get the metadata for a method.
+  print(Colorize("Class methods")..bgGreen());
   MethodMirror methodMirror = classMirror.declarations[Symbol('call')];
   Log log = methodMirror.metadata[0].reflectee;
   print("Log file is ${log.destination}");
 
   // Get the metadata for a property.
+  print(Colorize("Class properties")..bgGreen());
   VariableMirror variableMirror = classMirror.declarations[Symbol('status')];
   Doc doc = variableMirror.metadata[0].reflectee;
   print("Doc file is ${doc.path}");
 
   // Get the metadata for a typedef.
   // ???
-  TypeProcessor processorInstance = (int value) {
-    if (value > 0) {
-      print("That's OK.");
-    } else {
-      print("A fatal error occurred !");
-    }
+  print(Colorize("Typedef")..bgGreen());
+  TypeProcessorBool processorInstance = (int value) {
+    if (value > 0) { print("That's OK."); }
+    else { print("A fatal error occurred !"); }
   };
-
   instanceMirror = reflect(processorInstance);
+  int n=0;
   instanceMirror.type.declarations.forEach((Symbol symbol, DeclarationMirror declarationMirror) {
-    print(declarationMirror.metadata);
+    if (declarationMirror.metadata.length > 0) {
+      n++;
+      declarationMirror.metadata.forEach((var value) => print("${n}: ${value.reflectee}"));
+    }
   });
-
-  TypeMirror typeMirror = reflectType(TypeProcessor);
-  print(typeMirror.originalDeclaration.metadata);
 
   // Get the metadata for a variable.
   // ???
-  @Doc('/var/doc/data')
-  int data = 10;
-
+  print(Colorize("Global variable")..bgGreen());
   instanceMirror = reflect(data);
-  print(instanceMirror.reflectee); // => 10
-  print(instanceMirror.type.declarations);
-
+  print("instanceMirror.reflectee => ${instanceMirror.reflectee}"); // => 10
+  n=0;
   instanceMirror.type.declarations.forEach((Symbol symbol, DeclarationMirror declarationMirror) {
-    print(declarationMirror.metadata);
+    if (declarationMirror.metadata.length > 0) {
+      n++;
+      declarationMirror.metadata.forEach((var value) => print("${n}: ${value.reflectee}"));
+    }
   });
 }
 
