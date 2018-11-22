@@ -2,9 +2,15 @@
 // The use of the keyword "await" makes the call to an asynchronous function
 // behave like a synchronous one. The execution of the next instruction does not
 // start until the asynchronous call terminates.
+//
+// You can wait for a Future to complete.
+// You can wait for data to be available in a Stream.
+// You can wait for data to be available in a ReceivePort (which is a Stream).
 
 import 'dart:async';
 import 'dart:io';
+
+typedef Streamer = Stream<int> Function();
 
 class Container {
   static int _counter = 1;
@@ -21,6 +27,10 @@ class Container {
 }
 
 main() async {
+
+  // ---------------------------------------------------------------------------
+  // Wait for a Future to complete.
+  // ---------------------------------------------------------------------------
 
   // Although the function executes asynchronously, the next execution does not
   // start before the current one terminates.
@@ -43,9 +53,26 @@ main() async {
   // We may also use a returned value.
 
   String v = await Container.sleep_and_return(1);
-  print("The data collected is ${v.toString()}");
+  print("The data collected is ${v}");
   v = await Container.sleep_and_return(1);
-  print("The data collected is ${v.toString()}");
+  print("The data collected is ${v}");
   v = await Container.sleep_and_return(1);
-  print("The data collected is ${v.toString()}");
+  print("The data collected is ${v}");
+
+  // ---------------------------------------------------------------------------
+  // Wait for a data to be available in a stream.
+  // ---------------------------------------------------------------------------
+
+  Streamer streamCreator = () async* {
+    for(int i=0; i<3; i++) {
+      yield 3*i;
+      sleep(Duration(seconds: 1));
+    }
+  };
+
+  await for (int value in streamCreator()) {
+    print("> ${value}");
+  }
+
+  print("Terminate the script");
 }
