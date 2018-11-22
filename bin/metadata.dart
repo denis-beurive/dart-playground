@@ -1,6 +1,7 @@
 // Resources:
 // https://stackoverflow.com/questions/26826521/executing-bundle-of-functions-by-their-metadata-tag-in-dart-lang
 // https://stackoverflow.com/questions/53415552/dart-how-to-get-metadata-for-anything-other-than-classes-and-class-members
+// https://www.dartlang.org/articles/dart-vm/reflection-with-mirrors
 
 import 'dart:mirrors';
 

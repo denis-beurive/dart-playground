@@ -2,6 +2,7 @@
 //
 // Resources:
 // https://github.com/dart-lang/sdk/issues/26738
+// http://jpryan.me/dartbyexample/examples/isolates/
 
 import 'dart:isolate';
 import 'dart:async';
