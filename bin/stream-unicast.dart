@@ -18,6 +18,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:dart_playground/stream_container_creator.dart';
+import 'package:colorize/colorize.dart';
 
 const int eventsCount = 5;
 const int waitBetweenTwoEvents = 1;
@@ -40,22 +41,22 @@ main() async {
 
   // One way to get all the values fired in the stream:
   await for(int value in streamCreator()) {
-    print("[1] An event has been received. The value is ${value}.");
+    print(Colorize("[1] A value is available: ${value}.")..lightRed());
   }
-  print("Done");
+  print(Colorize("Done")..lightRed());
 
   // Another way to get all the values fired in the stream:
-  await streamCreator().forEach((int value) {
-    print("[2] An event has been received. The value is ${value}.");
-  }).then((var v) { print("Done"); });
+  await streamCreator().forEach(
+    (int value) => print(Colorize("A value is available: ${value}.")..lightGreen())
+  ).then((var v) { print(Colorize("Done")..lightGreen()); });
 
   // Another way to get all the values fired in the stream:
   StreamSubscription<int> subscription = streamCreator().listen(
-          (value) => print("[3] An event has been received. The value is ${value}.")
+    (int value) => print(Colorize("[3] A value is available: ${value}.")..lightRed())
   );
-  await Future.wait([subscription.asFuture<int>()]).then((List<int> value) {
-    print("Done");
-  });
+  await Future.wait([subscription.asFuture<int>()]).then(
+    (List<int> value) => print(Colorize("Done")..lightRed())
+  );
 
   // See: https://api.dartlang.org/stable/2.0.0/dart-async/StreamSubscription/cancel.html
   //      The stream may need to shut down the source of events and clean up
@@ -71,9 +72,9 @@ main() async {
   Stream<int> shiftedStream = stream.skip(2);
 
   await for(int value in shiftedStream) {
-    print("[4] An event has been received. The value is ${value}.");
+    print(Colorize("[4] A value is available: ${value}.")..lightGreen());
   }
-  print("Done");
+  print(Colorize("Done")..lightGreen());
 
   // ---------------------------------------------------------------------------
   // TEST: keep only some of the values within the stream.
@@ -97,8 +98,8 @@ main() async {
 
   stream = streamCreator();
   Stream<int> doubledStream = stream.map((int value) => 2*value);
-  await doubledStream.forEach((int value) => print("[5] An event has been received. The value is ${value}."))
-      .then((var v) => print("Done"));
+  await doubledStream.forEach((int value) => print(Colorize("[5] A value is available: ${value}.")..lightRed()))
+      .then((var v) => print(Colorize("Done")..lightRed()));
 
   // ---------------------------------------------------------------------------
   // TEST: stop processing when the first value that verifies a given condition
