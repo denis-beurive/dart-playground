@@ -108,7 +108,7 @@ And yet another way:
 And:
 
 * [Stream transformers](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-transformer.dart)
-* [Stream controller](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-controller.dart)
+* [Stream controllers](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-controller.dart)
 
 
 
