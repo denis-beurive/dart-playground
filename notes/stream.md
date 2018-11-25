@@ -102,13 +102,13 @@ And yet another way:
 
 # Examples
 
-* [Unicast streams](bin/stream-unicast.dart)
-* [Broadcast streams](bin/stream-broadcast.dart)
+* [Unicast streams](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-unicast.dart)
+* [Broadcast streams](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-broadcast.dart)
 
 And:
 
-* [Stream transformers](bin/stream-transformer.dart)
-* [Stream controller](bin/stream-controller.dart)
+* [Stream transformers](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-transformer.dart)
+* [Stream controller](https://github.com/denis-beurive/dart-playground/tree/master/bin/stream-controller.dart)
 
 
 
