@@ -59,6 +59,9 @@ Example:
     }
 
 > Please note the use of the keywords `async*` and `yield`.
+>
+> * "async" creates a Future.
+> * "async*" creates a Stream.
 
 # Subscribing to a stream
 

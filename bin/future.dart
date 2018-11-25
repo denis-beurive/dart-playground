@@ -3,7 +3,7 @@
 // A "Future" is returned by a function that executes asynchronously.
 // When a "Future" is created, the asynchronous function that is responsible for
 // initialising it may not be terminated yet. Therefore, when it's created, the
-// "Future" is not initialised. It will be initialised (and so, ready to be used)
+// "Future" is not complete. It will be complete (and so, ready to be used)
 // at some point in the future (once the asynchronous function terminates its
 // execution).
 //
@@ -18,14 +18,12 @@ import 'dart:async';
 import 'dart:io';
 
 Future<int> sleep_and_double(int in_value) async {
-  Duration d = Duration(seconds: 1);
-  sleep(d);
+  sleep(Duration(seconds: 1));
   return 2*in_value;
 }
 
 Future<int> sleep_and_triple(int in_value, [int duration=1]) async {
-  Duration d = Duration(seconds: duration);
-  sleep(d);
+  sleep(Duration(seconds: duration));
   return 3*in_value;
 }
 
@@ -44,7 +42,7 @@ Future<bool> sleep_and_see() async {
 main() async {
 
   // ---------------------------------------------------------------------------
-  // TEST 1: how to use Futures.
+  // TEST: how to use Futures.
   // ---------------------------------------------------------------------------
 
   // The function "sleep_and_double()" returns immediately.
@@ -55,19 +53,19 @@ main() async {
   // We assign a callback function to "v".
   // This callback function will be executed when "v" is complete - that is when
   // the execution of the function "sleep_and_double" terminates.
-  v.then((int value) {
-    print("The asynchronous function sleep_and_double() finally returned! The returned value is ${value}");
-    // This callback function returns null.
-    // However, it could return a Future.
-  });
+  v.then(
+          (int value) => print("The asynchronous function sleep_and_double() finally returned! The returned value is ${value}")
+          // This callback function returns null.
+          // However, it could return a Future.
+  );
 
   // A shorter way to express the same code.
-  sleep_and_double(10).then((int value) {
-    print("The asynchronous function sleep_and_double() finally returned! The returned value is ${value}");
-  });
+  sleep_and_double(10).then(
+          (int value) => print("The asynchronous function sleep_and_double() finally returned! The returned value is ${value}")
+  );
 
   // ---------------------------------------------------------------------------
-  // TEST 2: chain of callback functions.
+  // TEST: chain of callback functions.
   // ---------------------------------------------------------------------------
 
   sleep_and_double(10).then((int value) {
@@ -82,20 +80,28 @@ main() async {
   });
 
   // ---------------------------------------------------------------------------
-  // TEST 3: wait for multiple asynchronous calls to complete.
+  // TEST: wait for a Future to complete.
+  // ---------------------------------------------------------------------------
+
+  print("Wait 4 seconds...");
+  int value = await sleep_and_triple(10, 4);
+  print("Done. Value is ${value}");
+
+  // ---------------------------------------------------------------------------
+  // TEST: wait for multiple asynchronous calls to complete.
   // ---------------------------------------------------------------------------
 
   Future.wait([sleep_and_double(10), sleep_and_triple(10, 2)]).then((List<int> list) {
-    print('The 2 asynchronous calls terminated! The returned values arer');
-    list.forEach((int value) => print("Value ${value}"));
+    print('The 2 asynchronous calls terminated! The returned values are:');
+    list.forEach((int value) => print("> Value ${value}"));
     // This callback function returns null.
     // However, it could return a Future.
   });
 
   // ---------------------------------------------------------------------------
-  // TEST 4: execute a list of asynchronous calls one after the other.
-  //         Note that the same result could have been obtained by applying the
-  //         technique used for the second test.
+  // TEST: execute a list of asynchronous calls one after the other.
+  //       Note that the same result could have been obtained by applying the
+  //       technique used for the second test.
   // ---------------------------------------------------------------------------
 
   List<Future<int>> list = [sleep_and_double(10), sleep_and_triple(10, 5)];
@@ -106,13 +112,13 @@ main() async {
   });
 
   // ---------------------------------------------------------------------------
-  // TEST 5: execute an asynchronous call until it returns false.
+  // TEST: execute an asynchronous call until it returns false.
   // ---------------------------------------------------------------------------
 
   Future.doWhile(sleep_and_see);
 
   // ---------------------------------------------------------------------------
-  // TEST 6: wait for a Future to be fully created.
+  // TEST: wait for a Future to be fully created.
   // ---------------------------------------------------------------------------
 
   print("Wait 2 seconds");
