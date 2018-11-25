@@ -100,4 +100,15 @@ And yet another way:
         print("Done");
     });
 
+# Examples
+
+* [Unicast streams](bin/stream-unicast.dart)
+* [Broadcast streams](bin/stream-broadcast.dart)
+
+And:
+
+* [Stream transformers](bin/stream-transformer.dart)
+* [Stream controller](bin/stream-controller.dart)
+
+
 
