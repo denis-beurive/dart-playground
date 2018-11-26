@@ -57,7 +57,7 @@ main() {
   print("Is a the variable \"d\" a list<int> ? ${d is List<int> ? 'yes' : 'no'}"); // => yes
 
   // ---------------------------------------------------------------------------
-  // TEST: what is FuturOr ?
+  // TEST: what is FutureOr ?
   // ---------------------------------------------------------------------------
 
   // How to interpret this signature ?
@@ -100,8 +100,5 @@ main() {
   );
 
   fint2.then((int value) { print("[3] The computation is done!"); });
-
-  
-
 
 }

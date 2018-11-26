@@ -11,17 +11,40 @@ The notation "`Future<int> object`" means: in the future, the object will be an 
 
 # Creating Futures
 
+There are two ways for creating a Future. You can use the keyword "async", or you can explicitly create a Future using
+the Future API. 
+
+## Using the keyword "async"
+
 The function below creates a "future integer":
 
+    /// Double a given value asynchronously.
+    /// [in_value] represents the value to double.
+    /// The function immediately returns an object, which is a Future.
+    /// This Future will not be complete after at least one second (may be more).
+    /// Please note the use of the keyword "async".
     Future<int> sleep_and_double(int in_value) async {
-      sleep(Duration(seconds: 1));
-      return 2*in_value;
+        sleep(Duration(seconds: 1));
+        return 2*in_value;
     }
 
 > Please note the use of the keyword "`async`".
 >
 > * "async" creates a Future.
 > * "async*" creates a Stream.
+
+## Explicitly returning a Future
+
+    /// Double a given value asynchronously.
+    /// [in_value] represents the value to double.
+    /// The function immediately returns an object, which is a Future.
+    /// This Future will not be complete after at least 3 seconds (may be more).
+    Future<int> another_sleep_and_double(int value) {
+        return Future(() {
+            sleep(Duration(seconds: 3));
+            return 2*value;
+        });
+    } 
 
 # Using the Future when it completes
 
@@ -63,6 +86,35 @@ is complete.
 
 The code `print("Done")` will not be executed until the two Futures returned by the functions `sleep_and_double()` and
 `sleep_and_triple()`  complete.
+
+# What is FutureOr<T>?
+
+How to interpret this signature ?
+
+    Future<T>.delayed(Duration duration, [ FutureOr<T> computation() ])
+
+This means that the function "computation" must return an object which type can be: `Future<T>` or `T`.
+
+* If the function returns a value of type `T`, then the value will be automatically wrapped into a Future.
+* If the function returns a value of type "Future<T>", then the value will be returned "as such".
+
+`FutureOr<T> computation()` returns `T` (in this case, an integer):
+
+    Future<int> f1 = Future.delayed(Duration(seconds: 1), () => 10);
+    f1.then((int value) => print(Colorize("[9] -> ${value}")..lightRed()));
+
+`FutureOr<T> computation()` returns `Future<T>`:
+
+    Future<int> f2 = Future.delayed(Duration(seconds: 1), () => Future<int>(() => 10));
+    f2.then((int value) => print(Colorize("[10] -> ${value}")..lightGreen()));
+
+The result is the same.
+
+Please note that if you create an object that includes "Futures inside Futures" (like Russian dolls), the resulting value
+is a "simple Future". The Dart VM removes peels "the onions" (removes the useless layers of Futures encapsulation). For example:
+
+    Future<int> f3 = Future.delayed(Duration(seconds: 1), () => Future<int>(() => Future<int>(() => 10)));
+    f3.then((int value) => print(Colorize("[10] -> ${value}")..lightRed()));
 
 # Examples
 
