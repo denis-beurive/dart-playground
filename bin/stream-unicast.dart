@@ -14,6 +14,7 @@
 // Please note that:
 // - "async" creates a Future.
 // - "async*" creates a Stream.
+// - "sync*" creates a synchronous iterator.
 
 import 'dart:io';
 import 'dart:async';

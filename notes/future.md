@@ -32,6 +32,7 @@ The function below creates a "future integer":
 >
 > * "async" creates a Future.
 > * "async*" creates a Stream.
+> * "sync*" creates a synchronous iterator.
 
 ## Explicitly returning a Future
 

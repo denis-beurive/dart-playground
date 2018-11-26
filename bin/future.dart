@@ -13,6 +13,7 @@
 // Please note that:
 // - "async" creates a Future. However, this is not the only way to create Futures.
 // - "async*" creates a Stream.
+// - "sync*" creates a synchronous iterator.
 
 import 'package:colorize/colorize.dart';
 import 'dart:async';
