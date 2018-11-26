@@ -57,7 +57,7 @@ main() async {
   // at any point, and from anywhere. The stream has all the logic necessary to handle
   // listeners and pausing. You return the stream and keep the controller to yourself.
   StreamController<int> sc = StreamController<int>(
-      onListen: () => print("Controller: the stream has been assigned a listener!"),
+      onListen: () => print("Controller: the stream has been assigned a listener/subscriber!"),
       onCancel: () => print("Controller: the stream has been canceled!"),
       // As you may notice, the event handlers are not executed every time the
       // subscription gets paused or resumed.
@@ -99,7 +99,7 @@ main() async {
   // controller closes when it can do it. If you don't close the controller, the
   // "onDone" handler will not be executed.
   // See: https://stackoverflow.com/questions/53336297/cli-dart-onpause-onresume-ondone-not-firing-up-as-expected
-  sc.close().then((var v) => print("The stream controlled is now closed"));
+  sc.close().then((var v) => print("The stream controller is now closed"));
   print("Does the stream provided by the controller have a listener ? ${sc.hasListener ? 'yes' : 'no'} - the answer should be yes.");
 
   // Wait for 10 seconds.
