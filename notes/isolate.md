@@ -34,6 +34,12 @@ At this end, there are two channels that connect "`A`" and "`B`":
 
 Each isolate creates a channel and sends its "sender end" to the other isolate.
 
+# Channels
+
+A channel is a stream: the class [ReceivePort](https://api.dartlang.org/stable/2.1.0/dart-isolate/ReceivePort-class.html) extends the class Stream.
+
+Therefore, you use a channel the same way that you use a stream. See: [notes about streams](https://github.com/denis-beurive/dart-playground/blob/master/notes/stream.md).
+
 # Examples
 
 * [Isolates](https://github.com/denis-beurive/dart-playground/blob/master/bin/isolates.dart)
