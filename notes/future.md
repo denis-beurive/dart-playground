@@ -95,8 +95,8 @@ How to interpret this signature ?
 
 This means that the function "computation" must return an object which type can be: `Future<T>` or `T`.
 
-* If the function returns a value of type `T`, then the value will be automatically wrapped into a Future.
-* If the function returns a value of type "Future<T>", then the value will be returned "as such".
+* If the function returns a value of type `T`, then the value will be automatically wrapped into a `Future`.
+* If the function returns a value of type `Future<T>`, then the value will be returned "as such".
 
 `FutureOr<T> computation()` returns `T` (in this case, an integer):
 
