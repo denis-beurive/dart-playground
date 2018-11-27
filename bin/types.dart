@@ -124,6 +124,9 @@ main() {
   s2 = s2.toUpperCase();
   assert(s1 != s2 && 'Frist string' == s1); // This assertion is true.
 
+  int n = 10;
+  print("Runtype type of n is ${n.runtimeType}");
+
   // Non-primitive types are manipulated by reference.
 
   Map<String, int> m1 = {
