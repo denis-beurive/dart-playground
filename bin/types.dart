@@ -118,8 +118,7 @@ main() {
 
   // Primitive types are manipulated by value.
 
-  String s1 = 'Fr'
-      'ist string';
+  String s1 = 'First string';
   String s2 = s1;
   s2 = s2.toUpperCase();
   assert(s1 != s2 && 'Frist string' == s1); // This assertion is true.

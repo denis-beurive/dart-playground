@@ -1,187 +1,137 @@
-
-// In object-oriented and functional programming, an immutable object (unchangeable object)
-// is an object whose state cannot be modified after it is created. This is in contrast
-// to a mutable object (changeable object), which can be modified after it is created.
+// This script illustrates the concept of immutability in Dart.
 //
-// The keyword "const" is used to create an "immutable bound" *AND* an "immutable object".
-// This is symbolized by this: "const Map m = {}" is identical to "const Map m = const {}".
+// Wikipedia:
 //
-// - Immutable objects are initialized at compile time.
-// - Two immutable objects that reference "content identical" objects reference the same object.
-//   In other words:
-//   "const Map m1 = {}; const Map m2 = {};" => "m1 == m2" will return the value true.
-//   However, this is not true for mutable objects:
-//   "Map m1 = {}; Map m2 = {};" => "m1 == m2" will return the value false.
-// - Immutable objects cannot be assigned to object properties. They can only be
-//   assigned to class properties (that is to "static" properties).
+//    In object-oriented and functional programming, an immutable object (unchangeable object)
+//    is an object whose state cannot be modified after it is created. This is in contrast
+//    to a mutable object (changeable object), which can be modified after it is created.
 //
-// The keyword "final" is used to create objects that can be initialized only once, at runtime.
+// const: define immutable bonds to immutable objects that are initialised at compile time.
+// final: define immutable bonds to (unless otherwise stated) mutable objects that are initialised at runtime.
 //
 // See: https://pub.dartlang.org/documentation/matcher/latest/matcher/matcher-library.html
 // See: https://stackoverflow.com/questions/21744677/how-does-the-const-constructor-actually-work
 // See: https://medium.com/dartlang/an-intro-to-immutability-with-dart-d4de871865c7
 
 import 'dart:math';
-import "package:test/test.dart";
 
-// The keyword "const" is used to specify that the variable is a compile time constant.
-// The value of this variable cannot be modified at runtime.
-const String compileTimeConstantCityStringVariable = 'France';
-
-// The value of a final variable is not known at compile time.
-// Its value can be initialised at runtime only once.
-final bool debug = Random.secure().nextBool();
-
-class Address {
-  // The keyword "const" can be used within a class. However it can be applied
-  // to static properties (also called class properties) only. This restriction
-  // makes sense since there would be no reason to define an instance property
-  // which value cannot change from an instance to the other.
-  // Ever hear of Occam's razor? "Pluralitas non est ponenda sine necessitate"
-
-  static const String defaultCountry = 'France';
-  static const Map<String, int> countryCodes = {
-    'Belgium': 32,
-    'France': 33,
-    'Spain': 34
-  };
-  static const Map<String, String> capitalCities = const {
-    'Belgium': 'Bruxelles',
-    'France': 'Paris',
-    'Spain': 'Madrid'
-  };
-
-  static const String defaultCapitalCity = capitalCities[defaultCountry];
-
-  // The keyword "final" can be used within a class.
-  // Contrary to a "const" property:
-  // - a "final" property can apply to instance variables.
-  // - and a "final" property is initialised at runtime.
-
-  final String name = "The country is ${defaultCountry}";
-  final bool _debug = Random.secure().nextBool();
-
-  bool isDebugOn() => _debug;
-}
-
-// "immutable" constructors are used to instantiate objects that will be assigned
-// to "immutable" variables.
+/// This class represents a LOG file.
 class Log{
-  final String _path;
-  // Cannot be called if the instantiated object is assigned to a "non-const" variable.
+  final String _path; // This property is not initialised until the class is instantiated.
+  final Map<String, bool> _mode = { 'read': false, 'write': true };
+
   Log(this._path);
-  // Must be called if the instantiated object is assigned to a "const" variable.
-  const Log.forEver(this._path);
+  void setRead([bool mode=true]) { _mode['read'] = mode; }
+  void setWrite([bool mode=true]) { _mode['write'] = mode; }
+  Map<String, bool> getMode() => _mode;
   String getPath() => _path;
 }
 
+/// This class represents a metadata.
+/// Please note that
+class Metadata {
+  static const TAG = 'matadata'; // const properties must be static (class properties).
+  final String _onError;
+  Metadata(String this._onError);
+  const Metadata.forever(String this._onError);
+  String toString() => _onError;
+}
 
 
 
 main() {
 
+  // ---------------------------------------------------------------------------
+  // Synopsis
+  // ---------------------------------------------------------------------------
+
+  Map<int, int> a = {};             // "a" is bound to the (anonymous) object {}.
+  Map<int, int> b = a;              // "b" is bound to the (names) object "a".
+  final Map<int, int> c = a;        // the bond between "c" and "a" is immutable. However, you can change the "content" of "a".
+  c[10] = 100;                      // this is OK. The bound object is mutable.
+  a[10] = 100;                      // this is OK. The bound object is mutable.
+  const Map<int, int> d = {};       // the bond between "d" and the (anonymous) object {} is immutable. And the bound object is immutable.
+  Map<int, int> e = const {};       // the bond between "e" and the (anonymous) object {} is mutable. However, the bound object is immutable.
+  e = {1: 10};                      // this is OK.
+
+  // "f" is created at runtime. The bond is immutable and the bound object is immutable.
+  // This is "looks like" a "const" variable... but initialised at runtime.
+  final Metadata f = Metadata.forever('exitOnError-' + Random.secure().nextInt(100).toString());
+
+  // ---------------------------------------------------------------------------
+  // const: define immutable bonds to immutable objects that are initialised at
+  //        compile time.
+  // ---------------------------------------------------------------------------
+
   const Map mm1 = const {};
   const Map mm2 = {};
-  print(mm1 == mm2);
+  print("mm1 == mm2 ? " + (mm1 == mm2).toString()); // => mm1 == mm2 ? true
+  // mm1 = mm2; Although mm1 and mm2 reference the same object, this code is forbidden.
 
+  // You could also write: const Map<String, int> m1 = const { 'a': 1, 'b': 2 };
+  const Map<String, int> m1 = { 'a': 1, 'b': 2 };
 
-  // ---------------------------------------------------------------------------
-  // const
-  // ---------------------------------------------------------------------------
-
-  // Reminder
-  // ========
-  //
-  // In Dart, every variable is an object. The class which defines the instantiated
-  // object is called the "type" of the variable.
-  //
-  // However, some classes have constructors, others don't.
-  // For example:
-  // - The class "String" does not have a constructor.
-  // - The class "Map" has a constructor.
-  //
-  // Classes that don't have a constructor represents primitive types (ex: String, int...).
-  // Classes that have a constructor represents non-primitive types (ex: String, int...).
-  //
-  // See: https://github.com/denis-beurive/dart-playground/blob/master/bin/types.dart
-
-
-  // In Dart, the keyword "const" defines both an "immutable binding" *AND* an
-  // "immutable object".
-  //
-  // Illustration:
-  //
-  // Map is a non-primitive type. Thus, It is manipulated by reference.
-  //
-  // "m1" carries a reference to an (anonymous) object.
-  //
-  // The presence of the keyword "const" in front of the declaration implies that:
-  //
-  // [1] the value of "m1" (the reference) is constant. Thus "m1" will always
-  //     reference the same (anonymous) object. This property is called
-  //     "immutable binding"
-  // [2] the content of the referenced (anonymous) object is immutable.
-
-  const Map<String, int> m1 = {
-    'a': 1,
-    'b': 2
-  };
-
-  // You could also write:
-  //
-  // const Map<String, int> m1 = const {
-  //    'a': 1,
-  //    'b': 2
-  // };
-
-  test("You cannot modify the content of the object referenced by m1.",
-      // m1['d'] = 3; // Is forbidden.
-      () { expect(() { try { m1['d'] = 3; } catch (e) { throw Exception(); } },  throwsException); }
-  );
-
+  try { m1['d'] = 3; } catch (e) { print("[1] You cannot do that! ${e}"); }
+  // => [1] You cannot do that! Unsupported operation: Cannot set value in unmodifiable Map
   // m1 = {}; Is forbidden, at compile time, this time.
 
-  test("You cannot modify the content of the immutavle object referenced by m.",
-    () { expect(() { try {
-      ((Map<String, int> m) { m['a'] = 1; })(const {});
-    } catch (e) {
-      throw Exception();
-    }}, throwsException); }
-  );
+  try {
+    ((Map<String, int> m) { m['a'] = 1; })(const {});
+  } catch (e) {
+    print("[2] You cannot do that! ${e}");
+  }
+  // => [2] You cannot do that! Unsupported operation: Cannot set value in unmodifiable Map
+
+  ((Map<String, int> m) {
+    print("This immutable anonymous parameter is: " + m.toString());
+  })(const { 'a': 1, 'b': 2});
+  // => This immutable anonymous parameter is: {a: 1, b: 2}
 
   // ---------------------------------------------------------------------------
-  // "immutable" constructors.
+  // const constructors.
   // ---------------------------------------------------------------------------
 
-  // Comparing mutable variables.
-  // Although the "contents" of the objects referenced by "log1" and "log2" are
-  // identical, "log1" and "log2" reference different objects.
+  const Metadata meta1 = Metadata.forever('logoutAndClose');
+  Metadata meta2 = Metadata('logoutAndMove');
+  print("meta1: ${meta1}");
+  print("meta2: ${meta2}");
+  meta2 = Metadata('logoutAndRevert');
+  print("meta2: ${meta2}");
+
+  // The bond between "meta3" is not mutable.
+  // However, the bound (anonymous) object is immutable.
+  Metadata meta3 =  Metadata.forever('logoutAndClose');
+  print("meta3: ${meta3}");
+  meta3 = Metadata('logoutAndMove');
+  print("meta3: ${meta3}");
+
+  // ---------------------------------------------------------------------------
+  // final: define immutable bonds to (unless otherwise stated) mutable objects
+  //        that are initialised at runtime.
+  // ---------------------------------------------------------------------------
+
+  final int randomValue = Random.secure().nextInt(100);
+  print("The value of the runtime immutable variable <randomValue> is ${randomValue}. It will change from execution to execution.");
+
+  final Map<String, int> map1 = { 'a': 1 };
+  // map = {}; This code is not valid. The bond is not mutable.
+  map1['a'] = 2; // OK => The bound object is mutable.
+  map1['b'] = 3; // OK => The bound object is mutable.
+  print("map = ${map1}"); // => map = {a: 2, b: 3}
+
+  final Map<String, int> map2 = const { 'a': 1 };
+  try {
+    map2['a'] = 2; // KO => The bound object is not mutable.
+  } catch (e) { print("[3] You cannot do that! ${e}"); }
+  // [3] You cannot do that! Unsupported operation: Cannot set value in unmodifiable Map
+
   Log log1 = Log('/path/to/log');
   Log log2 = Log('/path/to/log');
-  // log1 and log2 reference *DIFFERENT* objects.
-  print(log1 == log2); // => false
+  final Log log3 = Log('/path/to/log');
+  print("log1 == log2 ? " + (log1 == log2).toString()); // => false
+  log1 = log3; // This is OK. However, you cannot write: log3 = log1 (the bond is not mutable)
 
-  print(Log.forEver('/path/to/log') == Log.forEver('/path/to/log')); // => false
 
-  // Comparing "immutable" variables.
-  // This line below is forbidden:
-  // const Log logForEver1 = Log('/path/to/log');
 
-  // As you can see, "logForEver1" and "logForEver2" reference the same object.
-  const Log logForEver1 = Log.forEver('/path/to/log');
-  const Log logForEver2 = Log.forEver('/path/to/log');
-  const Log logForEver3 = Log.forEver('/path/to/newlog');
-  // logForEver1 and logForEver2 reference the *SAME* object.
-  print(logForEver1 == logForEver2); // => true
-  // logForEver1 and logForEver3 reference *DIFFERENT* objects.
-  print(logForEver1 == logForEver3); // => false
 
-  // ---------------------------------------------------------------------------
-  // final
-  // ---------------------------------------------------------------------------
-
-  print(Address.defaultCapitalCity);
-  // The two function call below may produce different outputs.
-  print("Debug ? " + (Address().isDebugOn() ? 'true' : 'false'));
-  print("Debug ? " + (Address().isDebugOn() ? 'true' : 'false'));
 }
