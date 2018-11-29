@@ -51,7 +51,6 @@ class Log{
 }
 
 /// This class represents a metadata.
-/// Please note that
 class Metadata {
   static const TAG = 'matadata'; // const properties must be static (class properties).
   final String _onError;
