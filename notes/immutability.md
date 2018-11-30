@@ -44,14 +44,18 @@ When used within a class:
   "_Pluralitas non est ponenda sine necessitate_".
 * The keyword "`const`" may be used to qualify a constructor. See below.
 
-A "`const`" constructor returns an object that can be used:
+A "`const`" constructor always returns an immutable object. However, depending on how it is used, the returned object
+is initialised at compile-time or at runtime:
 
-* within a "_const_" construction: the constructor parameter must be a constant expression. And, in this case, the instantiated object is not mutable (and instantiated at compile-time).
+* within a "_const_" construction: the constructor parameter must be a constant expression. In this case, the instantiated object is instantiated at compile-time.
   *  `const <type> <variable name> = [const] ConstConstructor(...)`
   *  `const ConstConstructor(...)`
-* within a "_non-const_" construction: the constructor parameter does not have to be a constant expression. And, in this case, the instantiated object is mutable (and instantiated at runtime).
+* within a "_non-const_" construction: the constructor parameter does not have to be a constant expression. In this case, the instantiated object instantiated at runtime.
   *  `<type> <variable name> = ConstConstructor(...)`
   *  `ConstConstructor(...)`
+
+> Please note that built-in types (like Map or String) does not have an explicit "const" constructor. "const" objects are
+> built from literal expressions.
 
 ### Examples
 
@@ -136,37 +140,31 @@ Let's create an **immutable bond at runtime** to an immutable object (instantiat
 * You can mutate the (anonymous) object bound to `map` - `{ 'a': 1 }` (immutable object).
 * The (anonymous) object (`{ 'a': 1 }`) is instantiated a compile-time.
 
-
-
-
-
-
-
-
-
-
-
-
-## final in class
+Let's create a final property.
 
 The use case of a class is interesting. Within a class definition, a final property _may not appear to be initialised_.
 For example:
 
     class Log{
-      final String _path;
-      Log(this._path);
+      final String _path; // Not yet instantiated.
+      bool debug; // This class has no "const constructor". A non-final property is OK.
+      Log(this._path); // Calling the constructor will instantiate the property.
     }
 
 You may think that the property "`_path`" references an empty string (the default value for an instance of String).
 Thus, you may think that the immutable bond (between the property and the anonymous object "") is already created.
-So, you may think: "if I call the constructor, an error will be raised".
+So, you may think: "_if I call the constructor, an error will be raised !_".
 
 In fact, until the class gets instantiated, the property is not instantiated (thus the bond is not created yet).
 The bond will be created during the class instantiation - thus, during the constructor execution.
 
+Now, let's create a "const" constructor.
 
+    class Log{
+      final String _path;
+      Log(this._path);
+      const Log.forever(this._path);
+    }
 
-
-
-
-
+Since a "const constructor" creates an immutable object, all its properties must be "final" : once instantiated and
+initialised, the property value cannot change (in other words, the object cannot mutate).

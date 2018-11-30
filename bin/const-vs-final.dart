@@ -40,8 +40,9 @@ import 'dart:math';
 
 /// This class represents a LOG file.
 class Log{
-  final String _path; // This property is not initialised until the class is instantiated.
+  final String _path; // This property is not instantiated (and thus initialised) until the class is instantiated.
   final Map<String, bool> _mode = { 'read': false, 'write': true };
+  bool debug; // This class has no "const constructor". A non-final property is OK.
 
   Log(this._path);
   void setRead([bool mode=true]) { _mode['read'] = mode; }
