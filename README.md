@@ -29,6 +29,8 @@ For example:
 * [Streams](https://github.com/denis-beurive/dart-playground/blob/master/notes/stream.md)
 * [Stream controllers](https://github.com/denis-beurive/dart-playground/blob/master/notes/stream-controller.md)
 * [Synchronous iterators](https://github.com/denis-beurive/dart-playground/blob/master/notes/synchronous-iterator.md)
+* [Immutability](https://github.com/denis-beurive/dart-playground/blob/master/notes/immutability.md)
+* [Types](https://github.com/denis-beurive/dart-playground/blob/master/notes/types.md)
 
 # Tips and tricks
 
