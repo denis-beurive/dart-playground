@@ -38,23 +38,23 @@ Example:
 
 When used within a class:
 
-* in a property description, the keyword "`const`" can be applied to static properties
+* in a property declaration, the keyword "`const`" can be applied to static properties
   (also called class properties) only. This restriction makes sense since there would be no reason to define an instance
   property which value cannot change from an instance to the other. Ever hear of Occam's razor?
   "_Pluralitas non est ponenda sine necessitate_".
 * The keyword "`const`" may be used to qualify a constructor. See below.
 
-A "`const`" constructor always returns an immutable object. However, depending on how it is used, the returned object
+A "const constructor" always returns an immutable object. However, depending on how it is used, the returned object
 is initialised at compile-time or at runtime:
 
-* within a "_const_" construction: the constructor parameter must be a constant expression. In this case, the instantiated object is instantiated at compile-time.
+* within a "_const construction_": the constructor parameter must be a constant expression. In this case, the instantiated object is instantiated at compile-time.
   *  `const <type> <variable name> = [const] ConstConstructor(...)`
   *  `const ConstConstructor(...)`
-* within a "_non-const_" construction: the constructor parameter does not have to be a constant expression. In this case, the instantiated object instantiated at runtime.
+* within a "_non-const construction_": the constructor parameter does not have to be a constant expression. In this case, the instantiated object is instantiated at runtime.
   *  `<type> <variable name> = ConstConstructor(...)`
   *  `ConstConstructor(...)`
 
-> Please note that built-in types (like Map or String) does not have an explicit "const" constructor. "const" objects are
+> Please note that built-in types (like Map or String) does not have an explicit "const constructor". "const" objects are
 > built from literal expressions.
 
 ### Examples
@@ -168,3 +168,8 @@ Now, let's create a "const" constructor.
 
 Since a "const constructor" creates an immutable object, all its properties must be "final" : once instantiated and
 initialised, the property value cannot change (in other words, the object cannot mutate).
+
+## Examples
+
+[const vs final](https://github.com/denis-beurive/dart-playground/blob/master/bin/const-vs-final.dart)
+
