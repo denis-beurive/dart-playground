@@ -13,7 +13,7 @@ Dart defines two keywords that deal with immutability: `const` and `final`.
 Generally speaking:
 
 * The keyword "`const`" (always) creates an **immutable object** that is initialised at **compile-time**.
-* The keyword "`final`" (always) creates an **immutable bond at compile-time**.
+* The keyword "`final`" (always) creates an **immutable bond at runtime**.
 
 Now, things get a little more complex, depending on the context. See below.
 
